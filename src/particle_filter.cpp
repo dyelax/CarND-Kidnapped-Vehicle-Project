@@ -82,17 +82,24 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     float noisy_theta = dist_theta(gen);
     
     // Compute predicted location
-    float new_x =
-      noisy_x +
-      (velocity / yaw_rate) * (sin(noisy_theta + (yaw_rate * delta_t)) -
-                               sin(noisy_theta));
-    
-    float new_y =
-    noisy_y +
-    (velocity / yaw_rate) * (cos(noisy_theta) -
-                             cos(noisy_theta + (yaw_rate * delta_t)));
-    
-    float new_theta = noisy_theta + yaw_rate * delta_t;
+    float new_x, new_y, new_theta;
+    if (abs(yaw_rate) < 0.0000001) {
+      new_x = noisy_x + velocity * delta_t * cos(new_theta);
+      new_y = noisy_y + velocity * delta_t * sin(new_theta);
+      new_theta = noisy_theta;
+    } else {
+      new_x =
+        noisy_x +
+        (velocity / yaw_rate) * (sin(noisy_theta + (yaw_rate * delta_t)) -
+                                 sin(noisy_theta));
+      
+      new_y =
+        noisy_y +
+        (velocity / yaw_rate) * (cos(noisy_theta) -
+                                 cos(noisy_theta + (yaw_rate * delta_t)));
+      
+      new_theta = noisy_theta + yaw_rate * delta_t;
+    }
     
     // Create new particle with predicted position
     // TODO: check if we need to do this, or can just modify p.
